@@ -112,7 +112,7 @@
           <h1 class="text-lg font-bold bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
             Potentia <span class="text-xs font-semibold px-2 py-0.5 rounded bg-brand-500/20 text-brand-300 border border-brand-500/30 ml-1">4º ESO</span>
           </h1>
-          <p class="text-xs text-slate-400 hidden sm:block">Entrenamiento e Evaluación de Propiedades de Potencias</p>
+          <p class="text-xs text-slate-400 hidden sm:block">Entrenamiento y Evaluación de Propiedades de Potencias</p>
         </div>
       </div>
 
@@ -495,10 +495,10 @@
           <p class="text-xs text-slate-400">Para multiplicar potencias de la misma base se suman los exponentes. Para dividirlas, se restan.</p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-center">
             <div class="p-2 bg-slate-800 rounded-lg border border-slate-700 font-mono text-indigo-300">
-              $$a^m \\cdot a^n = a^{m+n}$$
+              $$a^m \cdot a^n = a^{m+n}$$
             </div>
             <div class="p-2 bg-slate-800 rounded-lg border border-slate-700 font-mono text-indigo-300">
-              $$\\frac{a^m}{a^n} = a^{m-n}$$
+              $$\frac{a^m}{a^n} = a^{m-n}$$
             </div>
           </div>
         </div>
@@ -509,24 +509,24 @@
           <p class="text-xs text-slate-400">Se multiplican los exponentes. El exponente se distribuye sobre productos y cocientes (¡NUNCA sobre sumas!).</p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-center">
             <div class="p-2 bg-slate-800 rounded-lg border border-slate-700 font-mono text-indigo-300">
-              $$(a^m)^n = a^{m \\cdot n}$$
+              $$(a^m)^n = a^{m \cdot n}$$
             </div>
             <div class="p-2 bg-slate-800 rounded-lg border border-slate-700 font-mono text-indigo-300">
-              $$(a \\cdot b)^n = a^n \\cdot b^n$$
+              $$(a \cdot b)^n = a^n \cdot b^n$$
             </div>
           </div>
         </div>
 
         <!-- Rule 3: Exponentes Negativos y Fracciones -->
         <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/80 space-y-2">
-          <h4 class="font-bold text-brand-300 text-base">3. Exponentes Negativos y Fracciones Inverse</h4>
-          <p class="text-xs text-slate-400">Un exponente negativo invierte la base. Una fracción con exponente negativo se invierte la fracción.</p>
+          <h4 class="font-bold text-brand-300 text-base">3. Exponentes Negativos y Fracciones Inversas</h4>
+          <p class="text-xs text-slate-400">Un exponente negativo invierte la base. Una fracción con exponente negativo invierte la fracción.</p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-center">
             <div class="p-2 bg-slate-800 rounded-lg border border-slate-700 font-mono text-indigo-300">
-              $$a^{-n} = \\frac{1}{a^n}$$
+              $$a^{-n} = \frac{1}{a^n}$$
             </div>
             <div class="p-2 bg-slate-800 rounded-lg border border-slate-700 font-mono text-indigo-300">
-              $$\\left(\\frac{a}{b}\\right)^{-n} = \\left(\\frac{b}{a}\\right)^n$$
+              $$\left(\frac{a}{b}\right)^{-n} = \left(\frac{b}{a}\right)^n$$
             </div>
           </div>
         </div>
@@ -537,10 +537,10 @@
           <p class="text-xs text-slate-400">Toda potencia de exponente fraccionario equivale a un radical donde el denominador es el índice.</p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-center">
             <div class="p-2 bg-slate-800 rounded-lg border border-slate-700 font-mono text-indigo-300">
-              $$a^{\\frac{m}{n}} = \\sqrt[n]{a^m}$$
+              $$a^{\frac{m}{n}} = \sqrt[n]{a^m}$$
             </div>
             <div class="p-2 bg-slate-800 rounded-lg border border-slate-700 font-mono text-indigo-300">
-              $$a^{-\\frac{m}{n}} = \\frac{1}{\\sqrt[n]{a^m}}$$
+              $$a^{-\frac{m}{n}} = \frac{1}{\sqrt[n]{a^m}}$$
             </div>
           </div>
         </div>
@@ -700,7 +700,9 @@
 
     function renderMath() {
       if (window.MathJax && window.MathJax.typesetPromise) {
-        window.MathJax.typesetPromise().catch(err => console.log('MathJax error:', err));
+        window.MathJax.typesetPromise().catch(err => {
+          console.warn('MathJax typesetting queue:', err);
+        });
       }
     }
 
@@ -724,12 +726,6 @@
       return arr;
     }
 
-    function gcd(a, b) {
-      a = Math.abs(a); b = Math.abs(b);
-      while (b) { let t = b; b = a % b; a = t; }
-      return a;
-    }
-
     function formatPrimePowerProduct(powers) {
       const parts = [];
       for (let p of powers) {
@@ -741,23 +737,41 @@
       return parts.join(' \\cdot ');
     }
 
+    // Deduplicate options helper
+    function sanitizeChoices(choicesList) {
+      const seen = new Set();
+      const result = [];
+      for (let c of choicesList) {
+        if (!seen.has(c.text)) {
+          seen.add(c.text);
+          result.push(c);
+        }
+      }
+      return result;
+    }
+
     // --- LEVEL 1 GENERATORS (Propiedades Básicas) ---
     function genL1_ProductQuotient() {
-      const vars = ['x', 'a', 'y', 'b', 'm'];
+      const vars = ['x', 'a', 'y', 'b', 'm', 'z', 'p'];
       const v = randomChoice(vars);
-      const e1 = randomInt(2, 7);
-      const e2 = randomInt(2, 8);
-      const e3 = randomInt(2, 6);
+      let e1 = randomInt(2, 6);
+      let e2 = randomInt(2, 6);
+      while (e1 === 2 && e2 === 2) e2 = randomInt(3, 7); // Avoid e1*e2 == e1+e2
+      const e3 = randomInt(1, Math.min(e1 + e2 - 1, 5));
       
       const correctExp = e1 + e2 - e3;
       const questionTeX = '\\frac{' + v + '^{' + e1 + '} \\cdot ' + v + '^{' + e2 + '}}{' + v + '^{' + e3 + '}}';
 
-      const choices = [
+      const rawChoices = [
         { text: '$' + v + '^{' + correctExp + '}$', correct: true },
         { text: '$' + v + '^{' + (e1 * e2 - e3) + '}$', correct: false },
         { text: '$' + v + '^{' + (e1 + e2 + e3) + '}$', correct: false },
-        { text: '$' + v + '^{' + (e1 + e2) + '}$', correct: false }
+        { text: '$' + v + '^{' + (e1 + e2) + '}$', correct: false },
+        { text: '$' + v + '^{' + (e1 * e2 + e3) + '}$', correct: false },
+        { text: '$' + v + '^{' + (correctExp + 2) + '}$', correct: false }
       ];
+
+      const choices = sanitizeChoices(rawChoices).slice(0, 4);
 
       return {
         id: 'L1_' + Math.random(),
@@ -776,19 +790,22 @@
 
     function genL1_PowerOfPower() {
       const v = randomChoice(['x', 'y', 'z', 'a']);
-      const e1 = randomInt(2, 5);
-      const e2 = randomInt(2, 4);
+      const e1 = randomInt(2, 4);
+      const e2 = randomInt(2, 3);
       const e3 = randomInt(2, 3);
       const correctExp = e1 * e2 * e3;
 
       const questionTeX = '\\left( (' + v + '^{' + e1 + '})^{' + e2 + '} \\right)^{' + e3 + '}';
 
-      const choices = [
+      const rawChoices = [
         { text: '$' + v + '^{' + correctExp + '}$', correct: true },
         { text: '$' + v + '^{' + (e1 + e2 + e3) + '}$', correct: false },
         { text: '$' + v + '^{' + (e1 * e2 + e3) + '}$', correct: false },
+        { text: '$' + v + '^{' + (correctExp + 2) + '}$', correct: false },
         { text: '$' + v + '^{' + Math.pow(e1, e2) + '}$', correct: false }
       ];
+
+      const choices = sanitizeChoices(rawChoices).slice(0, 4);
 
       return {
         id: 'L1_' + Math.random(),
@@ -806,30 +823,49 @@
     }
 
     function genL1_TrueFalse() {
-      const items = [
+      const v = randomChoice(['x', 'a', 'y', 'b', 'm', 'k']);
+      const e1 = randomInt(2, 5);
+      const e2 = randomInt(2, 5);
+
+      const templates = [
         {
-          statement: '¿Es correcta la igualdad $(x^3)^4 = x^7$?',
+          statement: `¿Es correcta la igualdad $(${v}^{${e1}})^{${e2}} = ${v}^{${e1 + e2}}$?`,
           correct: false,
-          explanation: 'Falso. En la potencia de una potencia los exponentes se multiplican: $(x^3)^4 = x^{3 \\cdot 4} = x^{12}$, no se suman.'
+          explanation: `Falso. En la potencia de una potencia los exponentes se multiplican: $(${v}^{${e1}})^{${e2}} = ${v}^{${e1} \\cdot ${e2}} = ${v}^{${e1 * e2}}$, no se suman.`
         },
         {
-          statement: '¿Es correcta la igualdad $(a \\cdot b)^5 = a^5 \\cdot b^5$?',
+          statement: `¿Es correcta la igualdad $(${v}^{${e1}})^{${e2}} = ${v}^{${e1 * e2}}$?`,
           correct: true,
-          explanation: 'Verdadero. La potencia de un producto es distributiva con respecto a la multiplicación.'
+          explanation: `Verdadero. En la potencia de una potencia los exponentes se multiplican: $(${v}^{${e1}})^{${e2}} = ${v}^{${e1} \\cdot ${e2}} = ${v}^{${e1 * e2}}$.`
         },
         {
-          statement: '¿Es correcta la igualdad $(x + y)^2 = x^2 + y^2$?',
+          statement: `¿Es correcta la igualdad $${v}^{${e1}} \\cdot ${v}^{${e2}} = ${v}^{${e1 * e2}}$?`,
           correct: false,
-          explanation: 'Falso. La potencia NO es distributiva respecto a la suma. $(x+y)^2 = x^2 + 2xy + y^2$ (producto notable).'
+          explanation: `Falso. Al multiplicar potencias de igual base se suman los exponentes ($${v}^{${e1}+${e2}} = ${v}^{${e1+e2}}$), no se multiplican.`
         },
         {
-          statement: '¿Es correcta la igualdad $x^0 = 1$ para cualquier $x \\neq 0$?',
+          statement: `¿Es correcta la igualdad $(${v} \\cdot z)^{${e1}} = ${v}^{${e1}} \\cdot z^{${e1}}$?`,
           correct: true,
-          explanation: 'Verdadero. Todo número no nulo elevado a cero es igual a 1.'
+          explanation: `Verdadero. La potencia de un producto es distributiva respecto a la multiplicación.`
+        },
+        {
+          statement: `¿Es correcta la igualdad $(${v} + z)^{${e1}} = ${v}^{${e1}} + z^{${e1}}$?`,
+          correct: false,
+          explanation: `Falso. La potencia NO es distributiva respecto a la suma.`
+        },
+        {
+          statement: `¿Es correcta la igualdad $\\frac{${v}^{${e1 + e2}}}{${v}^{${e1}}} = ${v}^{${e2}}$?`,
+          correct: true,
+          explanation: `Verdadero. Al dividir potencias de la misma base se restan los exponentes: $(${e1 + e2}) - ${e1} = ${e2}$.`
+        },
+        {
+          statement: `¿Es correcta la igualdad $${v}^0 = 1$ para cualquier $${v} \\neq 0$?`,
+          correct: true,
+          explanation: `Verdadero. Todo número no nulo elevado a cero es igual a 1.`
         }
       ];
 
-      const item = randomChoice(items);
+      const item = randomChoice(templates);
       const choices = [
         { text: 'Verdadero', correct: item.correct },
         { text: 'Falso', correct: !item.correct }
@@ -849,19 +885,22 @@
     // --- LEVEL 2 GENERATORS (Exponentes Negativos y Fraccionarios) ---
     function genL2_NegativeExponentFraction() {
       const a = randomInt(2, 5);
-      const b = randomInt(6, 9);
+      let b = randomInt(6, 9);
       const n = randomInt(2, 3);
 
       const questionTeX = '\\left( \\frac{' + a + '}{' + b + '} \\right)^{-' + n + '}';
       const numRes = Math.pow(b, n);
       const denRes = Math.pow(a, n);
 
-      const choices = [
+      const rawChoices = [
         { text: '$\\frac{' + numRes + '}{' + denRes + '}$', correct: true },
         { text: '$-\\frac{' + Math.pow(a, n) + '}{' + Math.pow(b, n) + '}$', correct: false },
         { text: '$\\frac{' + Math.pow(a, n) + '}{' + Math.pow(b, n) + '}$', correct: false },
-        { text: '$\\frac{' + (b * n) + '}{' + (a * n) + '}$', correct: false }
+        { text: '$\\frac{' + (b * n) + '}{' + (a * n) + '}$', correct: false },
+        { text: '$\\frac{' + (numRes + 1) + '}{' + denRes + '}$', correct: false }
       ];
+
+      const choices = sanitizeChoices(rawChoices).slice(0, 4);
 
       return {
         id: 'L2_' + Math.random(),
@@ -880,17 +919,21 @@
 
     function genL2_RadicalToPower() {
       const v = randomChoice(['x', 'y', 'a', 'b']);
-      const m = randomInt(3, 7);
-      const n = randomInt(2, 5);
+      let m = randomInt(3, 7);
+      let n = randomInt(2, 5);
+      while (m === n) m = randomInt(3, 7);
       
       const questionTeX = '\\sqrt[' + n + ']{' + v + '^{' + m + '}}';
 
-      const choices = [
+      const rawChoices = [
         { text: '$' + v + '^{\\frac{' + m + '}{' + n + '}}$', correct: true },
         { text: '$' + v + '^{\\frac{' + n + '}{' + m + '}}$', correct: false },
         { text: '$' + v + '^{' + (m * n) + '}$', correct: false },
-        { text: '$' + v + '^{' + (m - n) + '}$', correct: false }
+        { text: '$' + v + '^{' + (m - n) + '}$', correct: false },
+        { text: '$' + v + '^{\\frac{' + (m+1) + '}{' + n + '}}$', correct: false }
       ];
+
+      const choices = sanitizeChoices(rawChoices).slice(0, 4);
 
       return {
         id: 'L2_' + Math.random(),
@@ -914,7 +957,12 @@
         { base: 32, expNum: -3, expDen: 5, ans: '\\frac{1}{8}', steps: ['32^{-3/5} = \\frac{1}{32^{3/5}}', '\\sqrt[5]{32} = 2', '2^3 = 8 \\implies \\frac{1}{8}'] },
         { base: 81, expNum: 3, expDen: 4, ans: '27', steps: ['81^{3/4} = (\\sqrt[4]{81})^3', '\\sqrt[4]{81} = 3', '3^3 = 27'] },
         { base: 125, expNum: -2, expDen: 3, ans: '\\frac{1}{25}', steps: ['125^{-2/3} = \\frac{1}{125^{2/3}}', '\\sqrt[3]{125} = 5', '5^2 = 25 \\implies \\frac{1}{25}'] },
-        { base: 8, expNum: 4, expDen: 3, ans: '16', steps: ['8^{4/3} = (\\sqrt[3]{8})^4', '\\sqrt[3]{8} = 2', '2^4 = 16'] }
+        { base: 8, expNum: 4, expDen: 3, ans: '16', steps: ['8^{4/3} = (\\sqrt[3]{8})^4', '\\sqrt[3]{8} = 2', '2^4 = 16'] },
+        { base: 64, expNum: 2, expDen: 3, ans: '16', steps: ['64^{2/3} = (\\sqrt[3]{64})^2', '\\sqrt[3]{64} = 4', '4^2 = 16'] },
+        { base: 49, expNum: -1, expDen: 2, ans: '\\frac{1}{7}', steps: ['49^{-1/2} = \\frac{1}{\\sqrt{49}}', '\\sqrt{49} = 7 \\implies \\frac{1}{7}'] },
+        { base: 216, expNum: 2, expDen: 3, ans: '36', steps: ['216^{2/3} = (\\sqrt[3]{216})^2', '\\sqrt[3]{216} = 6', '6^2 = 36'] },
+        { base: 243, expNum: 3, expDen: 5, ans: '27', steps: ['243^{3/5} = (\\sqrt[5]{243})^3', '\\sqrt[5]{243} = 3', '3^3 = 27'] },
+        { base: 1000, expNum: -2, expDen: 3, ans: '\\frac{1}{100}', steps: ['1000^{-2/3} = \\frac{1}{1000^{2/3}}', '\\sqrt[3]{1000} = 10', '10^2 = 100 \\implies \\frac{1}{100}'] }
       ];
 
       const item = randomChoice(bank);
@@ -925,15 +973,19 @@
       let distractors = [
         item.ans.includes('frac') ? item.ans.replace('\\frac{1}{', '').replace('}', '') : '\\frac{1}{' + item.ans + '}',
         '-' + item.ans,
-        String(item.base * absNum)
+        String(item.base * absNum),
+        '1'
       ];
 
-      const choices = [
+      const rawChoices = [
         { text: '$' + item.ans + '$', correct: true },
         { text: '$' + distractors[0] + '$', correct: false },
         { text: '$' + distractors[1] + '$', correct: false },
-        { text: '$' + distractors[2] + '$', correct: false }
+        { text: '$' + distractors[2] + '$', correct: false },
+        { text: '$' + distractors[3] + '$', correct: false }
       ];
+
+      const choices = sanitizeChoices(rawChoices).slice(0, 4);
 
       return {
         id: 'L2_' + Math.random(),
@@ -975,12 +1027,19 @@
 
       const correctTeX = formatPrimePowerProduct([{base: 2, exp: p2}, {base: 3, exp: p3}]);
 
-      const choices = [
-        { text: '$' + correctTeX + '$', correct: true },
-        { text: '$' + formatPrimePowerProduct([{base: 2, exp: p2 + 2}, {base: 3, exp: p3 - 1}]) + '$', correct: false },
-        { text: '$' + formatPrimePowerProduct([{base: 2, exp: Math.abs(p2)}, {base: 3, exp: -p3}]) + '$', correct: false },
-        { text: '$' + formatPrimePowerProduct([{base: 2, exp: p2 - 1}, {base: 3, exp: p3 + 3}]) + '$', correct: false }
+      const candList = [
+        formatPrimePowerProduct([{base: 2, exp: p2 + 2}, {base: 3, exp: p3 - 1}]),
+        formatPrimePowerProduct([{base: 2, exp: p2 - 1}, {base: 3, exp: p3 + 2}]),
+        formatPrimePowerProduct([{base: 2, exp: p2 + 1}, {base: 3, exp: p3 + 1}]),
+        formatPrimePowerProduct([{base: 2, exp: p2 - 2}, {base: 3, exp: p3 - 2}])
       ];
+
+      const rawChoices = [{ text: '$' + correctTeX + '$', correct: true }];
+      candList.forEach(tex => {
+        rawChoices.push({ text: '$' + tex + '$', correct: false });
+      });
+
+      const choices = sanitizeChoices(rawChoices).slice(0, 4);
 
       const exprTeX = '\\frac{' + A.num + '^{' + expA + '} \\cdot ' + B.num + '^{' + expB + '}}{' + C.num + '^{' + expC + '} \\cdot ' + D.num + '^{' + expD + '}}';
 
@@ -1030,12 +1089,15 @@
       const questionTeX = '\\frac{(' + coefA + ' \\cdot 10^{' + expA + '}) \\cdot (' + coefB + ' \\cdot 10^{' + expB + '})}{' + coefC + ' \\cdot 10^{' + expC + '}}';
       const correctTeX = finalCoef + ' \\cdot 10^{' + finalExp + '}';
 
-      const choices = [
+      const rawChoices = [
         { text: '$' + correctTeX + '$', correct: true },
         { text: '$' + finalCoef + ' \\cdot 10^{' + (finalExp + 2) + '}$', correct: false },
         { text: '$' + (finalCoef * 10).toFixed(1) + ' \\cdot 10^{' + (finalExp - 1) + '}$', correct: false },
-        { text: '$' + finalCoef + ' \\cdot 10^{' + (expA + expB + expC) + '}$', correct: false }
+        { text: '$' + finalCoef + ' \\cdot 10^{' + (expA + expB + expC) + '}$', correct: false },
+        { text: '$' + finalCoef + ' \\cdot 10^{' + (finalExp - 2) + '}$', correct: false }
       ];
+
+      const choices = sanitizeChoices(rawChoices).slice(0, 4);
 
       return {
         id: 'L4_' + Math.random(),
@@ -1068,12 +1130,15 @@
 
       const correctTeX = 'x^{' + xFinal + '} \\cdot y^{' + yFinal + '}';
 
-      const choices = [
+      const rawChoices = [
         { text: '$' + correctTeX + '$', correct: true },
         { text: '$x^{' + (xFinal + 2) + '} \\cdot y^{' + (yFinal - 2) + '}$', correct: false },
         { text: '$x^{' + xInner + '} \\cdot y^{' + yInner + '}$', correct: false },
-        { text: '$x^{' + Math.abs(xFinal) + '} \\cdot y^{' + (-Math.abs(yFinal)) + '}$', correct: false }
+        { text: '$x^{' + Math.abs(xFinal) + '} \\cdot y^{' + (-Math.abs(yFinal)) + '}$', correct: false },
+        { text: '$x^{' + (xFinal - 1) + '} \\cdot y^{' + (yFinal + 1) + '}$', correct: false }
       ];
+
+      const choices = sanitizeChoices(rawChoices).slice(0, 4);
 
       return {
         id: 'L4_' + Math.random(),
@@ -1256,11 +1321,24 @@
        4. 1-HOUR EVALUATIVE CHALLENGE MODE (EXAMEN 4º ESO)
        =================================================================== */
     function startChallengeExam() {
-      // Generate 20 progressive questions: 5 of L1, 5 of L2, 5 of L3, 5 of L4
+      // Generate 20 unique progressive questions: 5 of L1, 5 of L2, 5 of L3, 5 of L4
       const examQuestions = [];
+      const usedQuestionKeys = new Set();
+
       for (let l = 1; l <= 4; l++) {
-        for (let i = 0; i < 5; i++) {
-          examQuestions.push(generateQuestionByLevel(l));
+        let added = 0;
+        let attempts = 0;
+
+        while (added < 5 && attempts < 200) {
+          attempts++;
+          const q = generateQuestionByLevel(l);
+          const key = q.question.replace(/\s+/g, '');
+
+          if (!usedQuestionKeys.has(key)) {
+            usedQuestionKeys.add(key);
+            examQuestions.push(q);
+            added++;
+          }
         }
       }
 
