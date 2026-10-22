@@ -1,0 +1,1628 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-900 text-slate-100">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Potentia 4º ESO - Dominio de Propiedades de las Potencias</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0f3ff',
+              100: '#e0e7ff',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- MathJax v3 Configuration & Script -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+      },
+      startup: {
+        pageReady: () => {
+          return MathJax.startup.defaultPageReady().then(() => {
+            console.log('MathJax initial rendering complete');
+          });
+        }
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <style>
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #475569;
+    }
+
+    /* Print Styles for Score Report */
+    @media print {
+      body {
+        background-color: white !important;
+        color: black !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-only {
+        display: block !important;
+      }
+      .print-card {
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
+        color: black !important;
+        background: white !important;
+      }
+    }
+
+    /* Pulse animation for timer warning */
+    @keyframes timerWarning {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.8; transform: scale(1.03); }
+    }
+    .timer-critical {
+      animation: timerWarning 1s infinite;
+    }
+  </style>
+</head>
+<body class="h-full flex flex-col font-sans antialiased selection:bg-brand-500 selection:text-white">
+
+  <!-- ================= HEADER / NAVBAR ================= -->
+  <header class="bg-slate-800/90 border-b border-slate-700/80 backdrop-blur sticky top-0 z-30 transition-all no-print">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex flex-wrap items-center justify-between gap-3">
+      
+      <!-- Brand Logo -->
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center shadow-lg shadow-brand-500/20 text-white font-black text-xl">
+          $x^n$
+        </div>
+        <div>
+          <h1 class="text-lg font-bold bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+            Potentia <span class="text-xs font-semibold px-2 py-0.5 rounded bg-brand-500/20 text-brand-300 border border-brand-500/30 ml-1">4º ESO</span>
+          </h1>
+          <p class="text-xs text-slate-400 hidden sm:block">Entrenamiento e Evaluación de Propiedades de Potencias</p>
+        </div>
+      </div>
+
+      <!-- Mode Switcher Navigation -->
+      <div class="flex items-center bg-slate-900/80 p-1 rounded-xl border border-slate-700/60">
+        <button id="nav-mode-practice" onclick="switchMode('practice')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center space-x-1.5 bg-brand-600 text-white shadow">
+          <span>🎯</span>
+          <span>Modo Práctica</span>
+        </button>
+        <button id="nav-mode-challenge" onclick="switchMode('challenge')" class="px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center space-x-1.5 text-slate-400 hover:text-slate-200">
+          <span>⏱️</span>
+          <span>Desafío 1 Hora</span>
+        </button>
+      </div>
+
+      <!-- Action & Stats Controls -->
+      <div class="flex items-center space-x-2">
+        <!-- Theory Cheat Sheet Modal Trigger -->
+        <button onclick="toggleTheoryModal(true)" class="p-2 rounded-lg bg-slate-700/60 hover:bg-slate-700 text-slate-200 hover:text-white transition border border-slate-600/50 text-xs sm:text-sm flex items-center space-x-1" title="Ver Guía Teórica de Propiedades">
+          <span>📖</span>
+          <span class="hidden md:inline">Teoría</span>
+        </button>
+
+        <!-- Sound Toggle Button -->
+        <button id="sound-btn" onclick="toggleSound()" class="p-2 rounded-lg bg-slate-700/60 hover:bg-slate-700 text-slate-200 hover:text-white transition border border-slate-600/50 text-xs sm:text-sm" title="Activar/Desactivar Sonido">
+          <span id="sound-icon">🔊</span>
+        </button>
+
+        <!-- Dynamic Quick Stats Widget -->
+        <div id="header-stats" class="hidden sm:flex items-center space-x-3 bg-slate-900/60 px-3 py-1.5 rounded-lg border border-slate-700/50 text-xs">
+          <div class="flex items-center space-x-1 text-emerald-400 font-semibold" title="Racha de aciertos seguidos">
+            <span>🔥</span>
+            <span id="stat-streak">0</span>
+          </div>
+          <div class="h-3 w-px bg-slate-700"></div>
+          <div class="flex items-center space-x-1 text-indigo-300 font-semibold" title="Puntuación acumulada">
+            <span>⭐</span>
+            <span id="stat-score">0 pts</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ================= MAIN CONTAINER ================= -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col">
+
+    <!-- ---------------------------------------------------- -->
+    <!-- VIEW 1: PRACTICE MODE BY LEVELS                       -->
+    <!-- ---------------------------------------------------- -->
+    <div id="view-practice" class="space-y-6">
+      
+      <!-- Level Tabs Bar -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-2 sm:gap-3">
+        <button onclick="setPracticeLevel(1)" id="lvl-btn-1" class="lvl-btn p-3 rounded-xl border text-left transition-all flex flex-col justify-between bg-brand-600/20 border-brand-500/80 text-white shadow-lg shadow-brand-500/10">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-brand-300">Nivel 1</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-brand-500/30 text-brand-200">Básico</span>
+          </div>
+          <div class="font-semibold text-sm mt-1">Propiedades Básicas</div>
+          <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-1">$a^m \cdot a^n$, $(a^m)^n$, cocientes</p>
+        </button>
+
+        <button onclick="setPracticeLevel(2)" id="lvl-btn-2" class="lvl-btn p-3 rounded-xl border border-slate-700/80 bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white text-left transition-all flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Nivel 2</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-slate-700 text-slate-300">Intermedio</span>
+          </div>
+          <div class="font-semibold text-sm mt-1">Negativos y Radicales</div>
+          <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-1">$a^{-n}$, $(a/b)^{-n}$, $a^{m/n} = \sqrt[n]{a^m}$</p>
+        </button>
+
+        <button onclick="setPracticeLevel(3)" id="lvl-btn-3" class="lvl-btn p-3 rounded-xl border border-slate-700/80 bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white text-left transition-all flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Nivel 3</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-slate-700 text-slate-300">Avanzado</span>
+          </div>
+          <div class="font-semibold text-sm mt-1">Factores Primos</div>
+          <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-1">Descomposición: $\frac{12^3 \cdot 18^{-2}}{6^4 \cdot 2^{-5}}$</p>
+        </button>
+
+        <button onclick="setPracticeLevel(4)" id="lvl-btn-4" class="lvl-btn p-3 rounded-xl border border-slate-700/80 bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white text-left transition-all flex flex-col justify-between">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Nivel 4</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-slate-700 text-slate-300">Experto</span>
+          </div>
+          <div class="font-semibold text-sm mt-1">Notación Científica y Desafíos</div>
+          <p class="text-[11px] text-slate-400 mt-0.5 line-clamp-1">Operaciones combinadas $10^k$ y problemas</p>
+        </button>
+      </div>
+
+      <!-- Practice Question Card -->
+      <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-5 sm:p-7 shadow-xl relative overflow-hidden">
+        
+        <!-- Question Level Header -->
+        <div class="flex items-center justify-between pb-4 border-b border-slate-700/60 mb-6">
+          <div class="flex items-center space-x-2">
+            <span id="practice-badge-level" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-brand-500/20 text-brand-300 border border-brand-500/30">
+              Nivel 1
+            </span>
+            <span id="practice-badge-type" class="px-2.5 py-1 rounded-lg text-xs font-medium bg-slate-700 text-slate-300">
+              Opción Múltiple
+            </span>
+          </div>
+          <button onclick="generateNextPracticeQuestion()" class="text-xs font-medium text-indigo-400 hover:text-indigo-300 flex items-center space-x-1 bg-indigo-950/50 hover:bg-indigo-900/50 px-3 py-1.5 rounded-lg border border-indigo-800/50 transition">
+            <span>🎲 Generar otro ejercicio</span>
+          </button>
+        </div>
+
+        <!-- Question Prompt Text & Math Display -->
+        <div class="mb-8">
+          <div id="practice-question-text" class="text-base sm:text-lg font-medium text-slate-100 leading-relaxed mb-4">
+            <!-- Math rendering target -->
+          </div>
+        </div>
+
+        <!-- Options Grid -->
+        <div id="practice-options-container" class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+          <!-- Dynamic Options Inject Here -->
+        </div>
+
+        <!-- Practice Feedback Banner -->
+        <div id="practice-feedback" class="hidden p-4 rounded-xl border text-sm transition-all mb-6">
+          <!-- Success / Error dynamic banner content -->
+        </div>
+
+        <!-- Hint Accordion & Explanation Trigger -->
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-slate-700/60">
+          <button onclick="togglePracticeHint()" class="text-xs sm:text-sm font-medium text-amber-400 hover:text-amber-300 flex items-center space-x-1.5 bg-amber-950/40 hover:bg-amber-900/40 px-3 py-2 rounded-xl border border-amber-800/40 transition">
+            <span>💡</span>
+            <span>Ver Pista</span>
+          </button>
+
+          <button id="btn-show-explanation" onclick="togglePracticeExplanation()" class="hidden text-xs sm:text-sm font-medium text-emerald-400 hover:text-emerald-300 flex items-center space-x-1.5 bg-emerald-950/40 hover:bg-emerald-900/40 px-3 py-2 rounded-xl border border-emerald-800/40 transition">
+            <span>📖</span>
+            <span>Explicación Paso a Paso</span>
+          </button>
+
+          <button onclick="generateNextPracticeQuestion()" class="ml-auto px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs sm:text-sm shadow-lg shadow-brand-600/30 transition flex items-center space-x-2">
+            <span>Siguiente Ejercicio</span>
+            <span>➡️</span>
+          </button>
+        </div>
+
+        <!-- Hint Content Container -->
+        <div id="practice-hint-box" class="hidden mt-4 p-4 rounded-xl bg-amber-950/30 border border-amber-800/50 text-amber-200 text-xs sm:text-sm leading-relaxed">
+          <div class="font-bold mb-1 flex items-center space-x-1 text-amber-300">
+            <span>💡 Pista del ejercicio:</span>
+          </div>
+          <div id="practice-hint-text"></div>
+        </div>
+
+        <!-- Step-by-Step Explanation Container -->
+        <div id="practice-explanation-box" class="hidden mt-4 p-5 rounded-xl bg-slate-900/90 border border-slate-700 text-slate-200 text-xs sm:text-sm space-y-3">
+          <div class="font-bold text-emerald-400 border-b border-slate-700/80 pb-2 flex items-center space-x-2 text-base">
+            <span>✨ Resolución paso a paso detallada</span>
+          </div>
+          <div id="practice-explanation-steps" class="space-y-3 leading-relaxed">
+            <!-- Dynamic LaTeX steps -->
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- VIEW 2: 1-HOUR CHALLENGE MODE (EXAMEN EVALUATIVO)     -->
+    <!-- ---------------------------------------------------- -->
+    <div id="view-challenge" class="hidden space-y-6">
+      
+      <!-- Challenge Header Panel with Timer & Progress -->
+      <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
+        
+        <!-- Timer Display -->
+        <div class="flex items-center space-x-3 w-full md:w-auto">
+          <div id="timer-icon" class="w-12 h-12 rounded-xl bg-indigo-500/20 border border-indigo-500/40 flex items-center justify-center text-2xl text-indigo-400 shadow-inner">
+            ⏱️
+          </div>
+          <div>
+            <div class="text-xs text-slate-400 font-semibold uppercase tracking-wider">Tiempo Restante (Examen 1h)</div>
+            <div id="challenge-timer" class="text-2xl sm:text-3xl font-black font-mono text-white tracking-tight">
+              60:00
+            </div>
+          </div>
+        </div>
+
+        <!-- Progress Bar & Answer Count -->
+        <div class="w-full md:flex-1 max-w-md space-y-1.5">
+          <div class="flex justify-between text-xs font-medium text-slate-300">
+            <span>Progreso del Desafío</span>
+            <span id="challenge-progress-text">0 / 20 respondidas</span>
+          </div>
+          <div class="w-full bg-slate-900 rounded-full h-3 overflow-hidden border border-slate-700/80 p-0.5">
+            <div id="challenge-progress-bar" class="bg-gradient-to-r from-brand-500 to-emerald-400 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+
+        <!-- Finish Exam Button -->
+        <button onclick="promptFinishExam()" class="w-full md:w-auto px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm shadow-lg shadow-emerald-600/20 transition flex items-center justify-center space-x-2">
+          <span>🏁</span>
+          <span>Finalizar y Evaluar</span>
+        </button>
+
+      </div>
+
+      <!-- Question Navigation Grid Bar -->
+      <div class="bg-slate-800/60 border border-slate-700/80 rounded-2xl p-4 shadow-lg">
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2 flex justify-between items-center">
+          <span>Navegador de Preguntas (20 ejercicios de 4º ESO)</span>
+          <span class="text-[11px] text-slate-400 font-normal">🟡 Marcada | 🟦 Respondiéndose | 🟢 Respondida</span>
+        </div>
+        <div id="challenge-nav-grid" class="grid grid-cols-5 sm:grid-cols-10 gap-2">
+          <!-- 20 Question Pills injected dynamically -->
+        </div>
+      </div>
+
+      <!-- Active Challenge Question Card -->
+      <div id="challenge-question-card" class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-5 sm:p-7 shadow-xl relative">
+        
+        <div class="flex items-center justify-between pb-3 border-b border-slate-700/60 mb-6">
+          <div class="flex items-center space-x-2">
+            <span id="challenge-q-number" class="px-3 py-1 rounded-lg text-xs font-bold bg-brand-600 text-white shadow">
+              Pregunta 1 de 20
+            </span>
+            <span id="challenge-q-level" class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-700 text-slate-300">
+              Nivel 1
+            </span>
+          </div>
+
+          <button id="btn-flag-question" onclick="toggleFlagCurrentQuestion()" class="px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-700 hover:bg-amber-950/60 hover:text-amber-300 text-slate-300 border border-slate-600/60 transition flex items-center space-x-1">
+            <span id="flag-icon">🚩</span>
+            <span id="flag-text">Marcar para revisar</span>
+          </button>
+        </div>
+
+        <!-- Question Prompt -->
+        <div id="challenge-question-text" class="text-base sm:text-lg font-medium text-slate-100 leading-relaxed mb-8">
+          <!-- Math target -->
+        </div>
+
+        <!-- Options List -->
+        <div id="challenge-options-container" class="grid grid-cols-1 md:grid-cols-2 gap-3.5 mb-8">
+          <!-- Choices injected -->
+        </div>
+
+        <!-- Exam Navigation Controls -->
+        <div class="flex items-center justify-between pt-4 border-t border-slate-700/60">
+          <button id="btn-prev-q" onclick="navigateChallengeQuestion(-1)" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 font-semibold text-xs sm:text-sm transition flex items-center space-x-1.5 disabled:opacity-40 disabled:cursor-not-allowed">
+            <span>⬅️</span>
+            <span>Anterior</span>
+          </button>
+
+          <button id="btn-next-q" onclick="navigateChallengeQuestion(1)" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs sm:text-sm shadow-lg shadow-brand-600/30 transition flex items-center space-x-1.5">
+            <span>Siguiente</span>
+            <span>➡️</span>
+          </button>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- ---------------------------------------------------- -->
+    <!-- VIEW 3: EXAM EVALUATION REPORT CARD (INFORME FINAL)   -->
+    <!-- ---------------------------------------------------- -->
+    <div id="view-report" class="hidden space-y-6">
+      
+      <!-- Grade Summary Card -->
+      <div class="bg-slate-800/90 border border-slate-700/80 rounded-2xl p-6 sm:p-8 shadow-2xl print-card">
+        
+        <div class="flex flex-col md:flex-row items-center justify-between gap-6 pb-6 border-b border-slate-700/80">
+          
+          <div class="text-center md:text-left">
+            <span class="text-xs font-bold uppercase tracking-widest text-brand-400 bg-brand-500/10 px-3 py-1 rounded-full border border-brand-500/20">
+              Informe Oficial de Evaluación - 4º ESO
+            </span>
+            <h2 class="text-2xl sm:text-3xl font-black text-white mt-2">
+              Resultados del Desafío de Potencias
+            </h2>
+            <p class="text-xs sm:text-sm text-slate-400 mt-1">
+              Evaluación completada el <span id="report-date" class="text-slate-200 font-medium">--</span>
+            </p>
+          </div>
+
+          <!-- Main Score Badge (Scale 0 to 10) -->
+          <div class="flex items-center space-x-4 bg-slate-900/80 px-6 py-4 rounded-2xl border border-slate-700 shadow-inner">
+            <div class="text-center">
+              <div class="text-xs text-slate-400 uppercase font-semibold">Nota Final</div>
+              <div id="report-score-num" class="text-4xl sm:text-5xl font-black text-emerald-400 font-mono tracking-tight">
+                8.5
+              </div>
+              <div id="report-score-qualitative" class="text-xs font-bold uppercase tracking-wider text-emerald-300 mt-0.5">
+                NOTABLE
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Detailed Metrics Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 py-6 border-b border-slate-700/80 text-center">
+          <div class="p-3 bg-slate-900/50 rounded-xl border border-slate-800">
+            <div class="text-xs text-slate-400">Aciertos ✅</div>
+            <div id="report-correct-count" class="text-2xl font-bold text-emerald-400 font-mono mt-1">17 / 20</div>
+          </div>
+          <div class="p-3 bg-slate-900/50 rounded-xl border border-slate-800">
+            <div class="text-xs text-slate-400">Errores ❌</div>
+            <div id="report-incorrect-count" class="text-2xl font-bold text-rose-400 font-mono mt-1">3 / 20</div>
+          </div>
+          <div class="p-3 bg-slate-900/50 rounded-xl border border-slate-800">
+            <div class="text-xs text-slate-400">Sin Responder ⚪</div>
+            <div id="report-omitted-count" class="text-2xl font-bold text-slate-400 font-mono mt-1">0</div>
+          </div>
+          <div class="p-3 bg-slate-900/50 rounded-xl border border-slate-800">
+            <div class="text-xs text-slate-400">Tiempo Empleado ⏳</div>
+            <div id="report-time-spent" class="text-2xl font-bold text-indigo-300 font-mono mt-1">42m 15s</div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap items-center justify-between gap-3 pt-6 no-print">
+          <button onclick="window.print()" class="px-4 py-2.5 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-semibold text-xs sm:text-sm transition flex items-center space-x-2">
+            <span>🖨️</span>
+            <span>Imprimir / Guardar PDF</span>
+          </button>
+
+          <div class="flex items-center space-x-2">
+            <button onclick="startChallengeExam()" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs sm:text-sm shadow transition flex items-center space-x-1.5">
+              <span>🔄</span>
+              <span>Reintentar Nuevo Desafío</span>
+            </button>
+
+            <button onclick="switchMode('practice')" class="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm shadow transition flex items-center space-x-1.5">
+              <span>🎯</span>
+              <span>Volver a Modo Práctica</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Question-by-Question Breakdown Accordion -->
+      <div class="space-y-4 print-card">
+        <h3 class="text-lg font-bold text-slate-200 px-1 flex items-center space-x-2">
+          <span>📋</span>
+          <span>Desglose y Solucionario de Ejercicios</span>
+        </h3>
+        <div id="report-questions-list" class="space-y-4">
+          <!-- Dynamically populated review items -->
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- ================= THEORY REFERENCE MODAL ================= -->
+  <div id="modal-theory" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-3xl w-full max-h-[90vh] flex flex-col shadow-2xl overflow-hidden">
+      
+      <!-- Modal Header -->
+      <div class="p-5 bg-slate-900/90 border-b border-slate-700 flex items-center justify-between">
+        <div class="flex items-center space-x-2">
+          <span class="text-xl">📖</span>
+          <h3 class="text-lg font-bold text-white">Guía de Propiedades de las Potencias (4º ESO)</h3>
+        </div>
+        <button onclick="toggleTheoryModal(false)" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition">
+          ✕
+        </button>
+      </div>
+
+      <!-- Modal Body -->
+      <div class="p-6 overflow-y-auto space-y-6 text-sm text-slate-200">
+        
+        <!-- Rule 1: Multiplicación y División -->
+        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/80 space-y-2">
+          <h4 class="font-bold text-brand-300 text-base">1. Producto y Cociente de Potencias de Igual Base</h4>
+          <p class="text-xs text-slate-400">Para multiplicar potencias de la misma base se suman los exponentes. Para dividirlas, se restan.</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-center">
+            <div class="p-2 bg-slate-800 rounded-lg border border-slate-700 font-mono text-indigo-300">
+              $$a^m \\cdot a^n = a^{m+n}$$
+            </div>
+            <div class="p-2 bg-slate-800 rounded-lg border border-slate-700 font-mono text-indigo-300">
+              $$\\frac{a^m}{a^n} = a^{m-n}$$
+            </div>
+          </div>
+        </div>
+
+        <!-- Rule 2: Potencia de Potencia y Productos -->
+        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/80 space-y-2">
+          <h4 class="font-bold text-brand-300 text-base">2. Potencia de una Potencia y Distribución</h4>
+          <p class="text-xs text-slate-400">Se multiplican los exponentes. El exponente se distribuye sobre productos y cocientes (¡NUNCA sobre sumas!).</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-center">
+            <div class="p-2 bg-slate-800 rounded-lg border border-slate-700 font-mono text-indigo-300">
+              $$(a^m)^n = a^{m \\cdot n}$$
+            </div>
+            <div class="p-2 bg-slate-800 rounded-lg border border-slate-700 font-mono text-indigo-300">
+              $$(a \\cdot b)^n = a^n \\cdot b^n$$
+            </div>
+          </div>
+        </div>
+
+        <!-- Rule 3: Exponentes Negativos y Fracciones -->
+        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/80 space-y-2">
+          <h4 class="font-bold text-brand-300 text-base">3. Exponentes Negativos y Fracciones Inverse</h4>
+          <p class="text-xs text-slate-400">Un exponente negativo invierte la base. Una fracción con exponente negativo se invierte la fracción.</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-center">
+            <div class="p-2 bg-slate-800 rounded-lg border border-slate-700 font-mono text-indigo-300">
+              $$a^{-n} = \\frac{1}{a^n}$$
+            </div>
+            <div class="p-2 bg-slate-800 rounded-lg border border-slate-700 font-mono text-indigo-300">
+              $$\\left(\\frac{a}{b}\\right)^{-n} = \\left(\\frac{b}{a}\\right)^n$$
+            </div>
+          </div>
+        </div>
+
+        <!-- Rule 4: Exponentes Fraccionarios y Radicales -->
+        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/80 space-y-2">
+          <h4 class="font-bold text-brand-300 text-base">4. Exponentes Fraccionarios y Radicales</h4>
+          <p class="text-xs text-slate-400">Toda potencia de exponente fraccionario equivale a un radical donde el denominador es el índice.</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 text-center">
+            <div class="p-2 bg-slate-800 rounded-lg border border-slate-700 font-mono text-indigo-300">
+              $$a^{\\frac{m}{n}} = \\sqrt[n]{a^m}$$
+            </div>
+            <div class="p-2 bg-slate-800 rounded-lg border border-slate-700 font-mono text-indigo-300">
+              $$a^{-\\frac{m}{n}} = \\frac{1}{\\sqrt[n]{a^m}}$$
+            </div>
+          </div>
+        </div>
+
+        <!-- Rule 5: Descomposición Factorial -->
+        <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-700/80 space-y-2">
+          <h4 class="font-bold text-brand-300 text-base">5. Estrategia clave en 4º ESO: Descomposición en Primos</h4>
+          <p class="text-xs text-slate-300 leading-relaxed">
+            Cuando tengas números compuestos como $12, 18, 6, 24, 15, 45$:
+            <br>1º Descompón cada número en primos: $12 = 2^2 \cdot 3$, $18 = 2 \cdot 3^2$, $6 = 2 \cdot 3$.
+            <br>2º Eleva cada factor al exponente del número: $12^3 = (2^2 \cdot 3)^3 = 2^6 \cdot 3^3$.
+            <br>3º Agrupa bases iguales sumando o restando exponentes.
+          </p>
+        </div>
+
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="p-4 bg-slate-900/90 border-t border-slate-700 text-right">
+        <button onclick="toggleTheoryModal(false)" class="px-5 py-2 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-xs sm:text-sm transition">
+          Entendido, Volver a los Ejercicios
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ================= CONFIRMATION MODAL ================= -->
+  <div id="modal-confirm" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-slate-800 border border-slate-700 rounded-2xl max-w-md w-full p-6 space-y-4 shadow-2xl">
+      <div class="flex items-center space-x-3 text-amber-400">
+        <span class="text-3xl">⚠️</span>
+        <h3 class="text-lg font-bold text-white">¿Entregar Desafío Evaluativo?</h3>
+      </div>
+      <p id="confirm-modal-text" class="text-xs sm:text-sm text-slate-300 leading-relaxed">
+        ¿Estás seguro de que deseas finalizar la prueba ahora? Tienes preguntas pendientes sin responder.
+      </p>
+      <div class="flex justify-end space-x-3 pt-3">
+        <button onclick="closeConfirmModal()" class="px-4 py-2 rounded-xl bg-slate-700 hover:bg-slate-600 text-slate-200 text-xs sm:text-sm font-semibold transition">
+          Continuar Examen
+        </button>
+        <button onclick="submitExamNow()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs sm:text-sm font-bold transition">
+          Sí, Finalizar
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ================= JAVASCRIPT APPLICATION LOGIC ================= -->
+  <script>
+    /* ===================================================================
+       1. GLOBAL STATE & SOUND ENGINE
+       =================================================================== */
+    const appState = {
+      mode: 'practice', // 'practice' | 'challenge' | 'report'
+      soundEnabled: true,
+      practice: {
+        level: 1,
+        currentQuestion: null,
+        userAnswered: false,
+        streak: 0,
+        score: 0
+      },
+      challenge: {
+        questions: [],
+        userAnswers: Array(20).fill(null),
+        flagged: Array(20).fill(false),
+        currentIndex: 0,
+        timerSeconds: 3600, // 60 minutes
+        timerInterval: null,
+        startTime: null,
+        endTime: null,
+        isFinished: false
+      }
+    };
+
+    // Web Audio Synthesizer
+    let audioCtx = null;
+    function getAudioContext() {
+      if (!audioCtx) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (AudioCtx) audioCtx = new AudioCtx();
+      }
+      if (audioCtx && audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+      return audioCtx;
+    }
+
+    function playSound(type) {
+      if (!appState.soundEnabled) return;
+      try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const now = ctx.currentTime;
+
+        if (type === 'correct') {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(523.25, now); // C5
+          osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+          osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.35);
+        } else if (type === 'incorrect') {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(220, now); // A3
+          osc.frequency.exponentialRampToValueAtTime(140, now + 0.25);
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.25);
+        } else if (type === 'click') {
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(550, now);
+          gain.gain.setValueAtTime(0.04, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + 0.05);
+        } else if (type === 'finish') {
+          [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, now + i * 0.08);
+            gain.gain.setValueAtTime(0.1, now + i * 0.08);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.7);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(now + i * 0.08);
+            osc.stop(now + 0.7);
+          });
+        }
+      } catch (e) {
+        console.error('Audio play error:', e);
+      }
+    }
+
+    function toggleSound() {
+      appState.soundEnabled = !appState.soundEnabled;
+      document.getElementById('sound-icon').textContent = appState.soundEnabled ? '🔊' : '🔇';
+    }
+
+    function renderMath() {
+      if (window.MathJax && window.MathJax.typesetPromise) {
+        window.MathJax.typesetPromise().catch(err => console.log('MathJax error:', err));
+      }
+    }
+
+    /* ===================================================================
+       2. MATH HELPERS & PARAMETRIC QUESTION GENERATORS
+       =================================================================== */
+    function randomInt(min, max) {
+      return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function randomChoice(arr) {
+      return arr[Math.floor(Math.random() * arr.length)];
+    }
+
+    function shuffleArray(array) {
+      const arr = [...array];
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+      return arr;
+    }
+
+    function gcd(a, b) {
+      a = Math.abs(a); b = Math.abs(b);
+      while (b) { let t = b; b = a % b; a = t; }
+      return a;
+    }
+
+    function formatPrimePowerProduct(powers) {
+      const parts = [];
+      for (let p of powers) {
+        if (p.exp === 0) continue;
+        if (p.exp === 1) parts.push(String(p.base));
+        else parts.push(p.base + '^{' + p.exp + '}');
+      }
+      if (parts.length === 0) return '1';
+      return parts.join(' \\cdot ');
+    }
+
+    // --- LEVEL 1 GENERATORS (Propiedades Básicas) ---
+    function genL1_ProductQuotient() {
+      const vars = ['x', 'a', 'y', 'b', 'm'];
+      const v = randomChoice(vars);
+      const e1 = randomInt(2, 7);
+      const e2 = randomInt(2, 8);
+      const e3 = randomInt(2, 6);
+      
+      const correctExp = e1 + e2 - e3;
+      const questionTeX = '\\frac{' + v + '^{' + e1 + '} \\cdot ' + v + '^{' + e2 + '}}{' + v + '^{' + e3 + '}}';
+
+      const choices = [
+        { text: '$' + v + '^{' + correctExp + '}$', correct: true },
+        { text: '$' + v + '^{' + (e1 * e2 - e3) + '}$', correct: false },
+        { text: '$' + v + '^{' + (e1 + e2 + e3) + '}$', correct: false },
+        { text: '$' + v + '^{' + (e1 + e2) + '}$', correct: false }
+      ];
+
+      return {
+        id: 'L1_' + Math.random(),
+        level: 1,
+        levelTitle: 'Nivel 1: Propiedades Básicas',
+        question: 'Simplifica la siguiente expresión a una única potencia: <div class="my-3 text-center text-xl font-bold">$$' + questionTeX + '$$</div>',
+        options: shuffleArray(choices),
+        hint: 'Suma los exponentes del numerador ($a^m \\cdot a^n = a^{m+n}$) y resta el exponente del denominador ($\\frac{a^m}{a^n} = a^{m-n}$).',
+        explanationSteps: [
+          '1. Sumamos los exponentes del numerador por tener la misma base: $' + v + '^{' + e1 + '} \\cdot ' + v + '^{' + e2 + '} = ' + v + '^{' + e1 + '+' + e2 + '} = ' + v + '^{' + (e1+e2) + '}$.',
+          '2. Dividimos entre el denominador restando exponentes: $\\frac{' + v + '^{' + (e1+e2) + '}}{' + v + '^{' + e3 + '}} = ' + v + '^{' + (e1+e2) + '-' + e3 + '} = ' + v + '^{' + correctExp + '}$.',
+          '3. Resultado final simplificado: $' + v + '^{' + correctExp + '}$.'
+        ]
+      };
+    }
+
+    function genL1_PowerOfPower() {
+      const v = randomChoice(['x', 'y', 'z', 'a']);
+      const e1 = randomInt(2, 5);
+      const e2 = randomInt(2, 4);
+      const e3 = randomInt(2, 3);
+      const correctExp = e1 * e2 * e3;
+
+      const questionTeX = '\\left( (' + v + '^{' + e1 + '})^{' + e2 + '} \\right)^{' + e3 + '}';
+
+      const choices = [
+        { text: '$' + v + '^{' + correctExp + '}$', correct: true },
+        { text: '$' + v + '^{' + (e1 + e2 + e3) + '}$', correct: false },
+        { text: '$' + v + '^{' + (e1 * e2 + e3) + '}$', correct: false },
+        { text: '$' + v + '^{' + Math.pow(e1, e2) + '}$', correct: false }
+      ];
+
+      return {
+        id: 'L1_' + Math.random(),
+        level: 1,
+        levelTitle: 'Nivel 1: Potencia de una Potencia',
+        question: 'Aplica la propiedad de potencia de una potencia para simplificar: <div class="my-3 text-center text-xl font-bold">$$' + questionTeX + '$$</div>',
+        options: shuffleArray(choices),
+        hint: 'Para elevar una potencia a otra potencia se conserva la base y se multiplican los exponentes: $((a^m)^n)^p = a^{m \\cdot n \\cdot p}$.',
+        explanationSteps: [
+          '1. Aplicamos la regla $(a^m)^n = a^{m \\cdot n}$ iterativamente.',
+          '2. Multiplicamos todos los exponentes entre sí: $' + e1 + ' \\cdot ' + e2 + ' \\cdot ' + e3 + ' = ' + correctExp + '$.',
+          '3. Expresión reducida: $' + v + '^{' + correctExp + '}$.'
+        ]
+      };
+    }
+
+    function genL1_TrueFalse() {
+      const items = [
+        {
+          statement: '¿Es correcta la igualdad $(x^3)^4 = x^7$?',
+          correct: false,
+          explanation: 'Falso. En la potencia de una potencia los exponentes se multiplican: $(x^3)^4 = x^{3 \\cdot 4} = x^{12}$, no se suman.'
+        },
+        {
+          statement: '¿Es correcta la igualdad $(a \\cdot b)^5 = a^5 \\cdot b^5$?',
+          correct: true,
+          explanation: 'Verdadero. La potencia de un producto es distributiva con respecto a la multiplicación.'
+        },
+        {
+          statement: '¿Es correcta la igualdad $(x + y)^2 = x^2 + y^2$?',
+          correct: false,
+          explanation: 'Falso. La potencia NO es distributiva respecto a la suma. $(x+y)^2 = x^2 + 2xy + y^2$ (producto notable).'
+        },
+        {
+          statement: '¿Es correcta la igualdad $x^0 = 1$ para cualquier $x \\neq 0$?',
+          correct: true,
+          explanation: 'Verdadero. Todo número no nulo elevado a cero es igual a 1.'
+        }
+      ];
+
+      const item = randomChoice(items);
+      const choices = [
+        { text: 'Verdadero', correct: item.correct },
+        { text: 'Falso', correct: !item.correct }
+      ];
+
+      return {
+        id: 'L1_' + Math.random(),
+        level: 1,
+        levelTitle: 'Nivel 1: Identificación de Propiedades',
+        question: 'Determina la veracidad de la siguiente afirmación matemática: <div class="my-3 text-center text-lg font-bold text-indigo-300">' + item.statement + '</div>',
+        options: choices,
+        hint: 'Recuerda distinguir entre multiplicación de potencias ($a^m \\cdot a^n = a^{m+n}$) y potencia de potencia ($(a^m)^n = a^{m \\cdot n}$).',
+        explanationSteps: [item.explanation]
+      };
+    }
+
+    // --- LEVEL 2 GENERATORS (Exponentes Negativos y Fraccionarios) ---
+    function genL2_NegativeExponentFraction() {
+      const a = randomInt(2, 5);
+      const b = randomInt(6, 9);
+      const n = randomInt(2, 3);
+
+      const questionTeX = '\\left( \\frac{' + a + '}{' + b + '} \\right)^{-' + n + '}';
+      const numRes = Math.pow(b, n);
+      const denRes = Math.pow(a, n);
+
+      const choices = [
+        { text: '$\\frac{' + numRes + '}{' + denRes + '}$', correct: true },
+        { text: '$-\\frac{' + Math.pow(a, n) + '}{' + Math.pow(b, n) + '}$', correct: false },
+        { text: '$\\frac{' + Math.pow(a, n) + '}{' + Math.pow(b, n) + '}$', correct: false },
+        { text: '$\\frac{' + (b * n) + '}{' + (a * n) + '}$', correct: false }
+      ];
+
+      return {
+        id: 'L2_' + Math.random(),
+        level: 2,
+        levelTitle: 'Nivel 2: Exponentes Negativos y Fracciones',
+        question: 'Calcula el valor exacto de la fracción expresada con exponente negativo: <div class="my-3 text-center text-xl font-bold">$$' + questionTeX + '$$</div>',
+        options: shuffleArray(choices),
+        hint: 'Un exponente negativo invierte la fracción base: $\\left(\\frac{a}{b}\\right)^{-n} = \\left(\\frac{b}{a}\\right)^n = \\frac{b^n}{a^n}$.',
+        explanationSteps: [
+          '1. Invertimos la fracción para cambiar el signo del exponente: $\\left(\\frac{' + a + '}{' + b + '}\\right)^{-' + n + '} = \\left(\\frac{' + b + '}{' + a + '}\\right)^{' + n + '}$.',
+          '2. Elevamos numerador y denominador al exponente ' + n + ': $\\frac{' + b + '^{' + n + '}}{' + a + '^{' + n + '}} = \\frac{' + numRes + '}{' + denRes + '}$.',
+          '3. Resultado simplificado: $\\frac{' + numRes + '}{' + denRes + '}$.'
+        ]
+      };
+    }
+
+    function genL2_RadicalToPower() {
+      const v = randomChoice(['x', 'y', 'a', 'b']);
+      const m = randomInt(3, 7);
+      const n = randomInt(2, 5);
+      
+      const questionTeX = '\\sqrt[' + n + ']{' + v + '^{' + m + '}}';
+
+      const choices = [
+        { text: '$' + v + '^{\\frac{' + m + '}{' + n + '}}$', correct: true },
+        { text: '$' + v + '^{\\frac{' + n + '}{' + m + '}}$', correct: false },
+        { text: '$' + v + '^{' + (m * n) + '}$', correct: false },
+        { text: '$' + v + '^{' + (m - n) + '}$', correct: false }
+      ];
+
+      return {
+        id: 'L2_' + Math.random(),
+        level: 2,
+        levelTitle: 'Nivel 2: Radicales a Exponente Fraccionario',
+        question: 'Expresa el radical como una única potencia de exponente fraccionario: <div class="my-3 text-center text-xl font-bold">$$' + questionTeX + '$$</div>',
+        options: shuffleArray(choices),
+        hint: 'Aplica la equivalencia $\\sqrt[n]{a^m} = a^{\\frac{m}{n}}$, donde el exponente del radicando es el numerador y el índice de la raíz es el denominador.',
+        explanationSteps: [
+          '1. El exponente interior de $' + v + '$ es $m = ' + m + '$ (numerador).',
+          '2. El índice del radical es $n = ' + n + '$ (denominador).',
+          '3. Transformación directa: $\\sqrt[' + n + ']{' + v + '^{' + m + '}} = ' + v + '^{\\frac{' + m + '}{' + n + '}}$.'
+        ]
+      };
+    }
+
+    function genL2_NumericFractional() {
+      const bank = [
+        { base: 27, expNum: -2, expDen: 3, ans: '\\frac{1}{9}', steps: ['27^{-2/3} = \\frac{1}{27^{2/3}}', '\\sqrt[3]{27} = 3', '3^2 = 9 \\implies \\frac{1}{9}'] },
+        { base: 16, expNum: 3, expDen: 4, ans: '8', steps: ['16^{3/4} = (\\sqrt[4]{16})^3', '\\sqrt[4]{16} = 2', '2^3 = 8'] },
+        { base: 32, expNum: -3, expDen: 5, ans: '\\frac{1}{8}', steps: ['32^{-3/5} = \\frac{1}{32^{3/5}}', '\\sqrt[5]{32} = 2', '2^3 = 8 \\implies \\frac{1}{8}'] },
+        { base: 81, expNum: 3, expDen: 4, ans: '27', steps: ['81^{3/4} = (\\sqrt[4]{81})^3', '\\sqrt[4]{81} = 3', '3^3 = 27'] },
+        { base: 125, expNum: -2, expDen: 3, ans: '\\frac{1}{25}', steps: ['125^{-2/3} = \\frac{1}{125^{2/3}}', '\\sqrt[3]{125} = 5', '5^2 = 25 \\implies \\frac{1}{25}'] },
+        { base: 8, expNum: 4, expDen: 3, ans: '16', steps: ['8^{4/3} = (\\sqrt[3]{8})^4', '\\sqrt[3]{8} = 2', '2^4 = 16'] }
+      ];
+
+      const item = randomChoice(bank);
+      const sign = item.expNum < 0 ? '-' : '';
+      const absNum = Math.abs(item.expNum);
+      const questionTeX = item.base + '^{' + sign + '\\frac{' + absNum + '}{' + item.expDen + '}}';
+
+      let distractors = [
+        item.ans.includes('frac') ? item.ans.replace('\\frac{1}{', '').replace('}', '') : '\\frac{1}{' + item.ans + '}',
+        '-' + item.ans,
+        String(item.base * absNum)
+      ];
+
+      const choices = [
+        { text: '$' + item.ans + '$', correct: true },
+        { text: '$' + distractors[0] + '$', correct: false },
+        { text: '$' + distractors[1] + '$', correct: false },
+        { text: '$' + distractors[2] + '$', correct: false }
+      ];
+
+      return {
+        id: 'L2_' + Math.random(),
+        level: 2,
+        levelTitle: 'Nivel 2: Cálculo con Exponentes Fraccionarios',
+        question: 'Calcula el valor numérico exacto de la expresión: <div class="my-3 text-center text-xl font-bold">$$' + questionTeX + '$$</div>',
+        options: shuffleArray(choices),
+        hint: 'Primero pasa a radical $(\\sqrt[n]{a})^m$ y si el exponente es negativo, invierte el resultado ($a^{-k} = 1/a^k$).',
+        explanationSteps: item.steps.map(s => '$' + s + '$')
+      };
+    }
+
+    // --- LEVEL 3 GENERATORS (Descomposición en Factores Primos) ---
+    function genL3_PrimeFactorization() {
+      const bases = [
+        { num: 12, primes: { 2: 2, 3: 1 } },
+        { num: 18, primes: { 2: 1, 3: 2 } },
+        { num: 6,  primes: { 2: 1, 3: 1 } },
+        { num: 4,  primes: { 2: 2, 3: 0 } },
+        { num: 8,  primes: { 2: 3, 3: 0 } },
+        { num: 9,  primes: { 2: 0, 3: 2 } },
+        { num: 24, primes: { 2: 3, 3: 1 } },
+        { num: 27, primes: { 2: 0, 3: 3 } }
+      ];
+
+      const A = randomChoice(bases);
+      let B = randomChoice(bases); while (B.num === A.num) B = randomChoice(bases);
+      const C = randomChoice(bases);
+      let D = randomChoice(bases); while (D.num === C.num) D = randomChoice(bases);
+
+      const expA = randomInt(2, 4);
+      const expB = randomInt(-3, 3) || 2;
+      const expC = randomInt(2, 4);
+      const expD = randomInt(-3, 2) || -1;
+
+      // Power totals for base 2 and 3
+      const p2 = (A.primes[2]*expA) + (B.primes[2]*expB) - (C.primes[2]*expC) - (D.primes[2]*expD);
+      const p3 = (A.primes[3]*expA) + (B.primes[3]*expB) - (C.primes[3]*expC) - (D.primes[3]*expD);
+
+      const correctTeX = formatPrimePowerProduct([{base: 2, exp: p2}, {base: 3, exp: p3}]);
+
+      const choices = [
+        { text: '$' + correctTeX + '$', correct: true },
+        { text: '$' + formatPrimePowerProduct([{base: 2, exp: p2 + 2}, {base: 3, exp: p3 - 1}]) + '$', correct: false },
+        { text: '$' + formatPrimePowerProduct([{base: 2, exp: Math.abs(p2)}, {base: 3, exp: -p3}]) + '$', correct: false },
+        { text: '$' + formatPrimePowerProduct([{base: 2, exp: p2 - 1}, {base: 3, exp: p3 + 3}]) + '$', correct: false }
+      ];
+
+      const exprTeX = '\\frac{' + A.num + '^{' + expA + '} \\cdot ' + B.num + '^{' + expB + '}}{' + C.num + '^{' + expC + '} \\cdot ' + D.num + '^{' + expD + '}}';
+
+      return {
+        id: 'L3_' + Math.random(),
+        level: 3,
+        levelTitle: 'Nivel 3: Simplificación con Factores Primos',
+        question: 'Simplifica la expresión reduciéndola a un producto de potencias de bases primas (2 y 3): <div class="my-3 text-center text-xl font-bold">$$' + exprTeX + '$$</div>',
+        options: shuffleArray(choices),
+        hint: 'Descompón $12, 18, 6$, etc. en factores primos ($2^x \\cdot 3^y$) y aplica $(a^x \\cdot b^y)^z = a^{xz} \\cdot b^{yz}$. Luego resta los exponentes del denominador.',
+        explanationSteps: [
+          '1. Descomposición en primos: $' + A.num + ' = 2^{' + A.primes[2] + '} \\cdot 3^{' + A.primes[3] + '}$, $' + B.num + ' = 2^{' + B.primes[2] + '} \\cdot 3^{' + B.primes[3] + '}$, $' + C.num + ' = 2^{' + C.primes[2] + '} \\cdot 3^{' + C.primes[3] + '}$, $' + D.num + ' = 2^{' + D.primes[2] + '} \\cdot 3^{' + D.primes[3] + '}$.',
+          '2. Numerador agrupado: $2^{' + (A.primes[2]*expA + B.primes[2]*expB) + '} \\cdot 3^{' + (A.primes[3]*expA + B.primes[3]*expB) + '}$.',
+          '3. Denominador agrupado: $2^{' + (C.primes[2]*expC + D.primes[2]*expD) + '} \\cdot 3^{' + (C.primes[3]*expC + D.primes[3]*expD) + '}$.',
+          '4. Resta de exponentes (Numerador - Denominador): Base 2 $\\rightarrow ' + p2 + '$, Base 3 $\\rightarrow ' + p3 + '$.',
+          '5. Resultado final: $' + correctTeX + '$.'
+        ]
+      };
+    }
+
+    // --- LEVEL 4 GENERATORS (Notación Científica y Desafíos Avanzados) ---
+    function genL4_ScientificNotation() {
+      const coefA = (randomInt(12, 48) / 10).toFixed(1);
+      const coefB = (randomInt(15, 40) / 10).toFixed(1);
+      const coefC = 2.0;
+
+      const expA = randomInt(3, 8);
+      const expB = randomInt(-5, 4);
+      const expC = randomInt(-3, 5);
+
+      const rawCoef = (parseFloat(coefA) * parseFloat(coefB)) / coefC;
+      const rawExp = expA + expB - expC;
+
+      // Normalize scientific notation
+      let finalCoef = rawCoef;
+      let finalExp = rawExp;
+      if (finalCoef >= 10) {
+        finalCoef /= 10;
+        finalExp += 1;
+      } else if (finalCoef < 1 && finalCoef > 0) {
+        finalCoef *= 10;
+        finalExp -= 1;
+      }
+
+      finalCoef = Math.round(finalCoef * 100) / 100;
+
+      const questionTeX = '\\frac{(' + coefA + ' \\cdot 10^{' + expA + '}) \\cdot (' + coefB + ' \\cdot 10^{' + expB + '})}{' + coefC + ' \\cdot 10^{' + expC + '}}';
+      const correctTeX = finalCoef + ' \\cdot 10^{' + finalExp + '}';
+
+      const choices = [
+        { text: '$' + correctTeX + '$', correct: true },
+        { text: '$' + finalCoef + ' \\cdot 10^{' + (finalExp + 2) + '}$', correct: false },
+        { text: '$' + (finalCoef * 10).toFixed(1) + ' \\cdot 10^{' + (finalExp - 1) + '}$', correct: false },
+        { text: '$' + finalCoef + ' \\cdot 10^{' + (expA + expB + expC) + '}$', correct: false }
+      ];
+
+      return {
+        id: 'L4_' + Math.random(),
+        level: 4,
+        levelTitle: 'Nivel 4: Operaciones en Notación Científica',
+        question: 'Realiza la siguiente operación en notación científica y expresa el resultado normalizado ($1 \\le c < 10$): <div class="my-3 text-center text-xl font-bold">$$' + questionTeX + '$$</div>',
+        options: shuffleArray(choices),
+        hint: 'Opera por separado los coeficientes numéricos y las potencias de 10 acumulando los exponentes ($10^a \\cdot 10^b / 10^c = 10^{a+b-c}$).',
+        explanationSteps: [
+          '1. Multiplicamos/dividimos coeficientes: $\\frac{' + coefA + ' \\cdot ' + coefB + '}{' + coefC + '} = ' + rawCoef.toFixed(2) + '$.',
+          '2. Operamos exponentes de base 10: $10^{' + expA + ' + (' + expB + ') - (' + expC + ')} = 10^{' + rawExp + '}$.',
+          '3. Normalizamos a notación científica estándar: $' + correctTeX + '$.'
+        ]
+      };
+    }
+
+    function genL4_ComplexAlgebraic() {
+      const aExp = randomInt(-3, -1);
+      const bExp = randomInt(2, 4);
+      const outerExp = randomInt(-2, 2) || -2;
+
+      const denAExp = Math.abs(aExp) + 1;
+      const questionTeX = '\\left( \\frac{x^{' + aExp + '} \\cdot y^{' + bExp + '}}{x^{' + denAExp + '} \\cdot y^{-2}} \\right)^{' + outerExp + '}';
+
+      const xInner = aExp - denAExp;
+      const yInner = bExp - (-2);
+
+      const xFinal = xInner * outerExp;
+      const yFinal = yInner * outerExp;
+
+      const correctTeX = 'x^{' + xFinal + '} \\cdot y^{' + yFinal + '}';
+
+      const choices = [
+        { text: '$' + correctTeX + '$', correct: true },
+        { text: '$x^{' + (xFinal + 2) + '} \\cdot y^{' + (yFinal - 2) + '}$', correct: false },
+        { text: '$x^{' + xInner + '} \\cdot y^{' + yInner + '}$', correct: false },
+        { text: '$x^{' + Math.abs(xFinal) + '} \\cdot y^{' + (-Math.abs(yFinal)) + '}$', correct: false }
+      ];
+
+      return {
+        id: 'L4_' + Math.random(),
+        level: 4,
+        levelTitle: 'Nivel 4: Simplificación Algebraica Combinada',
+        question: 'Simplifica completamente la expresión combinada de potencias: <div class="my-3 text-center text-xl font-bold">$$' + questionTeX + '$$</div>',
+        options: shuffleArray(choices),
+        hint: 'Simplifica primero el interior del paréntesis agrupando bases $x$ e $y$, y luego multiplica cada exponente por el exponente exterior $' + outerExp + '$.',
+        explanationSteps: [
+          '1. Agrupamos base $x$ en el interior: $x^{' + aExp + ' - (' + denAExp + ')} = x^{' + xInner + '}$.',
+          '2. Agrupamos base $y$ en el interior: $y^{' + bExp + ' - (-2)} = y^{' + yInner + '}$.',
+          '3. Aplicamos el exponente exterior ' + outerExp + ': $(x^{' + xInner + '})^{' + outerExp + '} = x^{' + xFinal + '}$, $(y^{' + yInner + '})^{' + outerExp + '} = y^{' + yFinal + '}$.',
+          '4. Expresión final: $' + correctTeX + '$.'
+        ]
+      };
+    }
+
+    // Question Generator Dispatcher
+    function generateQuestionByLevel(level) {
+      if (level === 1) {
+        const r = Math.random();
+        if (r < 0.4) return genL1_ProductQuotient();
+        if (r < 0.7) return genL1_PowerOfPower();
+        return genL1_TrueFalse();
+      } else if (level === 2) {
+        const r = Math.random();
+        if (r < 0.35) return genL2_NegativeExponentFraction();
+        if (r < 0.70) return genL2_RadicalToPower();
+        return genL2_NumericFractional();
+      } else if (level === 3) {
+        return genL3_PrimeFactorization();
+      } else {
+        return Math.random() < 0.5 ? genL4_ScientificNotation() : genL4_ComplexAlgebraic();
+      }
+    }
+
+
+    /* ===================================================================
+       3. PRACTICE MODE CONTROLLER
+       =================================================================== */
+    function setPracticeLevel(level) {
+      appState.practice.level = level;
+      
+      // Update Level Tab UI
+      for (let i = 1; i <= 4; i++) {
+        const btn = document.getElementById(`lvl-btn-${i}`);
+        if (i === level) {
+          btn.className = "lvl-btn p-3 rounded-xl border text-left transition-all flex flex-col justify-between bg-brand-600/20 border-brand-500/80 text-white shadow-lg shadow-brand-500/10";
+        } else {
+          btn.className = "lvl-btn p-3 rounded-xl border border-slate-700/80 bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white text-left transition-all flex flex-col justify-between";
+        }
+      }
+
+      generateNextPracticeQuestion();
+    }
+
+    function generateNextPracticeQuestion() {
+      appState.practice.userAnswered = false;
+      const q = generateQuestionByLevel(appState.practice.level);
+      appState.practice.currentQuestion = q;
+
+      // Update Question Card UI
+      document.getElementById('practice-badge-level').textContent = `Nivel ${q.level}`;
+      document.getElementById('practice-badge-type').textContent = q.options.length === 2 ? 'Verdadero/Falso' : 'Opción Múltiple';
+      document.getElementById('practice-question-text').innerHTML = q.question;
+      document.getElementById('practice-hint-text').innerHTML = q.hint;
+
+      // Hide Hint & Explanation Boxes
+      document.getElementById('practice-hint-box').classList.add('hidden');
+      document.getElementById('practice-explanation-box').classList.add('hidden');
+      document.getElementById('practice-feedback').classList.add('hidden');
+      document.getElementById('btn-show-explanation').classList.add('hidden');
+
+      // Populate Explanation Steps
+      const stepsContainer = document.getElementById('practice-explanation-steps');
+      stepsContainer.innerHTML = q.explanationSteps.map(step => '<div class="p-2.5 bg-slate-800/70 rounded-lg border border-slate-700/60">' + step + '</div>').join('');
+
+      // Render Options
+      const optionsContainer = document.getElementById('practice-options-container');
+      optionsContainer.innerHTML = '';
+
+      q.options.forEach((opt, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "p-4 rounded-xl border border-slate-700/80 bg-slate-900/60 hover:bg-slate-700/60 hover:border-brand-500/50 text-left font-medium transition-all flex items-center justify-between group shadow-sm";
+        btn.onclick = () => selectPracticeAnswer(idx);
+        btn.innerHTML = `
+          <div class="flex items-center space-x-3">
+            <span class="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 flex items-center justify-center text-xs font-bold text-slate-300 group-hover:border-brand-500 group-hover:text-white">
+              ${String.fromCharCode(65 + idx)}
+            </span>
+            <span class="text-sm sm:text-base text-slate-200">${opt.text}</span>
+          </div>
+          <span class="opt-status text-lg"></span>
+        `;
+        optionsContainer.appendChild(btn);
+      });
+
+      renderMath();
+    }
+
+    function selectPracticeAnswer(selectedIndex) {
+      if (appState.practice.userAnswered) return;
+      appState.practice.userAnswered = true;
+
+      const q = appState.practice.currentQuestion;
+      const isCorrect = q.options[selectedIndex].correct;
+
+      const optionsBtns = document.getElementById('practice-options-container').children;
+      
+      // Highlight Options
+      q.options.forEach((opt, idx) => {
+        const btn = optionsBtns[idx];
+        if (opt.correct) {
+          btn.className = "p-4 rounded-xl border-2 border-emerald-500 bg-emerald-950/40 text-left font-medium transition-all flex items-center justify-between shadow";
+          btn.querySelector('.opt-status').textContent = "✅";
+        } else if (idx === selectedIndex && !isCorrect) {
+          btn.className = "p-4 rounded-xl border-2 border-rose-500 bg-rose-950/40 text-left font-medium transition-all flex items-center justify-between shadow";
+          btn.querySelector('.opt-status').textContent = "❌";
+        } else {
+          btn.className += " opacity-50 cursor-not-allowed";
+        }
+      });
+
+      // Feedback Banner & Sound
+      const feedbackBanner = document.getElementById('practice-feedback');
+      feedbackBanner.classList.remove('hidden');
+
+      if (isCorrect) {
+        playSound('correct');
+        appState.practice.streak++;
+        appState.practice.score += 10 + (appState.practice.level * 5);
+        feedbackBanner.className = "p-4 rounded-xl border border-emerald-500/50 bg-emerald-950/40 text-emerald-200 text-sm flex items-center space-x-3 shadow-lg";
+        feedbackBanner.innerHTML = `
+          <span class="text-2xl">🎉</span>
+          <div>
+            <div class="font-bold text-emerald-300">¡Respuesta Correcta!</div>
+            <div class="text-xs text-emerald-200/80">Has aplicado correctamente las propiedades de las potencias. ¡Sigue así!</div>
+          </div>
+        `;
+      } else {
+        playSound('incorrect');
+        appState.practice.streak = 0;
+        feedbackBanner.className = "p-4 rounded-xl border border-rose-500/50 bg-rose-950/40 text-rose-200 text-sm flex items-center space-x-3 shadow-lg";
+        feedbackBanner.innerHTML = `
+          <span class="text-2xl">💡</span>
+          <div>
+            <div class="font-bold text-rose-300">Respuesta Incorrecta</div>
+            <div class="text-xs text-rose-200/80">Revisa los pasos en el botón "Explicación Paso a Paso" para entender el procedimiento.</div>
+          </div>
+        `;
+      }
+
+      // Show Explanation Button
+      document.getElementById('btn-show-explanation').classList.remove('hidden');
+      updateHeaderStatsUI();
+      renderMath();
+    }
+
+    function togglePracticeHint() {
+      playSound('click');
+      const box = document.getElementById('practice-hint-box');
+      box.classList.toggle('hidden');
+      renderMath();
+    }
+
+    function togglePracticeExplanation() {
+      playSound('click');
+      const box = document.getElementById('practice-explanation-box');
+      box.classList.toggle('hidden');
+      renderMath();
+    }
+
+    function updateHeaderStatsUI() {
+      document.getElementById('stat-streak').textContent = appState.practice.streak;
+      document.getElementById('stat-score').textContent = `${appState.practice.score} pts`;
+    }
+
+
+    /* ===================================================================
+       4. 1-HOUR EVALUATIVE CHALLENGE MODE (EXAMEN 4º ESO)
+       =================================================================== */
+    function startChallengeExam() {
+      // Generate 20 progressive questions: 5 of L1, 5 of L2, 5 of L3, 5 of L4
+      const examQuestions = [];
+      for (let l = 1; l <= 4; l++) {
+        for (let i = 0; i < 5; i++) {
+          examQuestions.push(generateQuestionByLevel(l));
+        }
+      }
+
+      appState.challenge.questions = examQuestions;
+      appState.challenge.userAnswers = Array(20).fill(null);
+      appState.challenge.flagged = Array(20).fill(false);
+      appState.challenge.currentIndex = 0;
+      appState.challenge.timerSeconds = 3600; // 60 minutes
+      appState.challenge.startTime = new Date();
+      appState.challenge.isFinished = false;
+
+      // Reset Timer
+      if (appState.challenge.timerInterval) clearInterval(appState.challenge.timerInterval);
+      appState.challenge.timerInterval = setInterval(updateChallengeTimer, 1000);
+
+      renderChallengeNavGrid();
+      renderChallengeQuestionCard();
+      switchMode('challenge');
+    }
+
+    function updateChallengeTimer() {
+      if (appState.challenge.timerSeconds <= 0) {
+        clearInterval(appState.challenge.timerInterval);
+        autoSubmitExamOnTimeout();
+        return;
+      }
+
+      appState.challenge.timerSeconds--;
+      const m = Math.floor(appState.challenge.timerSeconds / 60);
+      const s = appState.challenge.timerSeconds % 60;
+      const timerStr = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+      
+      const timerElem = document.getElementById('challenge-timer');
+      timerElem.textContent = timerStr;
+
+      // Pulse animation if less than 5 minutes remain
+      if (appState.challenge.timerSeconds <= 300) {
+        timerElem.classList.add('text-rose-400', 'timer-critical');
+      } else {
+        timerElem.classList.remove('text-rose-400', 'timer-critical');
+      }
+    }
+
+    function renderChallengeNavGrid() {
+      const grid = document.getElementById('challenge-nav-grid');
+      grid.innerHTML = '';
+
+      appState.challenge.questions.forEach((q, idx) => {
+        const btn = document.createElement('button');
+        btn.onclick = () => jumpToChallengeQuestion(idx);
+
+        const isCurrent = idx === appState.challenge.currentIndex;
+        const isAnswered = appState.challenge.userAnswers[idx] !== null;
+        const isFlagged = appState.challenge.flagged[idx];
+
+        let bgClass = "bg-slate-900 border-slate-700 text-slate-400";
+        if (isCurrent) {
+          bgClass = "bg-brand-600 border-brand-400 text-white font-bold ring-2 ring-brand-400/50";
+        } else if (isFlagged) {
+          bgClass = "bg-amber-950/80 border-amber-500 text-amber-300 font-bold";
+        } else if (isAnswered) {
+          bgClass = "bg-emerald-950/80 border-emerald-500 text-emerald-300 font-semibold";
+        }
+
+        btn.className = `p-2 rounded-xl border text-xs text-center transition flex flex-col items-center justify-center relative ${bgClass}`;
+        btn.innerHTML = `
+          <span>${idx + 1}</span>
+          ${isFlagged ? '<span class="absolute -top-1 -right-1 text-[10px]">🚩</span>' : ''}
+        `;
+        grid.appendChild(btn);
+      });
+
+      // Update overall progress bar
+      const answeredCount = appState.challenge.userAnswers.filter(a => a !== null).length;
+      document.getElementById('challenge-progress-text').textContent = `${answeredCount} / 20 respondidas`;
+      document.getElementById('challenge-progress-bar').style.width = `${(answeredCount / 20) * 100}%`;
+    }
+
+    function renderChallengeQuestionCard() {
+      const idx = appState.challenge.currentIndex;
+      const q = appState.challenge.questions[idx];
+
+      document.getElementById('challenge-q-number').textContent = `Pregunta ${idx + 1} de 20`;
+      document.getElementById('challenge-q-level').textContent = `Nivel ${q.level}`;
+      document.getElementById('challenge-question-text').innerHTML = q.question;
+
+      // Update Flag Button state
+      const isFlagged = appState.challenge.flagged[idx];
+      const flagBtn = document.getElementById('btn-flag-question');
+      if (isFlagged) {
+        flagBtn.className = "px-3 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/50 transition flex items-center space-x-1";
+        document.getElementById('flag-text').textContent = "Marcada";
+      } else {
+        flagBtn.className = "px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-700 hover:bg-amber-950/60 hover:text-amber-300 text-slate-300 border border-slate-600/60 transition flex items-center space-x-1";
+        document.getElementById('flag-text').textContent = "Marcar para revisar";
+      }
+
+      // Render Options
+      const optionsContainer = document.getElementById('challenge-options-container');
+      optionsContainer.innerHTML = '';
+
+      const selectedOptIdx = appState.challenge.userAnswers[idx];
+
+      q.options.forEach((opt, optIdx) => {
+        const btn = document.createElement('button');
+        btn.onclick = () => selectChallengeAnswer(optIdx);
+
+        const isSelected = selectedOptIdx === optIdx;
+        const borderClass = isSelected ? "border-brand-500 bg-brand-950/40 text-white ring-2 ring-brand-500/40" : "border-slate-700/80 bg-slate-900/60 hover:bg-slate-700/60 text-slate-200";
+
+        btn.className = `p-4 rounded-xl border text-left font-medium transition-all flex items-center justify-between group ${borderClass}`;
+        btn.innerHTML = `
+          <div class="flex items-center space-x-3">
+            <span class="w-7 h-7 rounded-lg ${isSelected ? 'bg-brand-600 text-white' : 'bg-slate-800 text-slate-300'} border border-slate-700 flex items-center justify-center text-xs font-bold">
+              ${String.fromCharCode(65 + optIdx)}
+            </span>
+            <span class="text-sm sm:text-base">${opt.text}</span>
+          </div>
+          ${isSelected ? '<span class="text-brand-400 text-lg">✓</span>' : ''}
+        `;
+        optionsContainer.appendChild(btn);
+      });
+
+      // Update Prev/Next buttons
+      document.getElementById('btn-prev-q').disabled = idx === 0;
+      document.getElementById('btn-next-q').innerHTML = idx === 19 ? '<span>Resumen Final</span><span>➡️</span>' : '<span>Siguiente</span><span>➡️</span>';
+
+      renderMath();
+    }
+
+    function selectChallengeAnswer(optionIdx) {
+      playSound('click');
+      const idx = appState.challenge.currentIndex;
+      appState.challenge.userAnswers[idx] = optionIdx;
+      renderChallengeNavGrid();
+      renderChallengeQuestionCard();
+    }
+
+    function toggleFlagCurrentQuestion() {
+      playSound('click');
+      const idx = appState.challenge.currentIndex;
+      appState.challenge.flagged[idx] = !appState.challenge.flagged[idx];
+      renderChallengeNavGrid();
+      renderChallengeQuestionCard();
+    }
+
+    function jumpToChallengeQuestion(idx) {
+      playSound('click');
+      appState.challenge.currentIndex = idx;
+      renderChallengeNavGrid();
+      renderChallengeQuestionCard();
+    }
+
+    function navigateChallengeQuestion(delta) {
+      playSound('click');
+      const newIdx = appState.challenge.currentIndex + delta;
+      if (newIdx >= 0 && newIdx < 20) {
+        appState.challenge.currentIndex = newIdx;
+        renderChallengeNavGrid();
+        renderChallengeQuestionCard();
+      } else if (newIdx === 20) {
+        promptFinishExam();
+      }
+    }
+
+    /* ===================================================================
+       5. EXAM EVALUATION & REPORT GENERATION
+       =================================================================== */
+    function promptFinishExam() {
+      playSound('click');
+      const unanswered = appState.challenge.userAnswers.filter(a => a === null).length;
+      const modalText = document.getElementById('confirm-modal-text');
+      
+      if (unanswered > 0) {
+        modalText.textContent = `Tienes ${unanswered} pregunta(s) sin responder. ¿Deseas entregar el examen de todas formas?`;
+      } else {
+        modalText.textContent = `Has respondido las 20 preguntas. ¿Confirmas la entrega para calcular tu calificación oficial?`;
+      }
+
+      document.getElementById('modal-confirm').classList.remove('hidden');
+    }
+
+    function closeConfirmModal() {
+      document.getElementById('modal-confirm').classList.add('hidden');
+    }
+
+    function autoSubmitExamOnTimeout() {
+      closeConfirmModal();
+      submitExamNow();
+    }
+
+    function submitExamNow() {
+      closeConfirmModal();
+      if (appState.challenge.timerInterval) clearInterval(appState.challenge.timerInterval);
+
+      appState.challenge.isFinished = true;
+      appState.challenge.endTime = new Date();
+
+      playSound('finish');
+      calculateAndDisplayReport();
+      switchMode('report');
+    }
+
+    function calculateAndDisplayReport() {
+      let correctCount = 0;
+      let incorrectCount = 0;
+      let omittedCount = 0;
+
+      const questions = appState.challenge.questions;
+      const userAnswers = appState.challenge.userAnswers;
+
+      questions.forEach((q, idx) => {
+        const uAns = userAnswers[idx];
+        if (uAns === null) {
+          omittedCount++;
+        } else if (q.options[uAns].correct) {
+          correctCount++;
+        } else {
+          incorrectCount++;
+        }
+      });
+
+      // Grade calculation on 0-10 scale (0.5 pts per question)
+      const scoreOn10 = (correctCount * 0.5).toFixed(1);
+
+      // Qualitative evaluation grade
+      let qual = "";
+      let qualClass = "";
+      if (scoreOn10 >= 9.0) { qual = "SOBRESALIENTE"; qualClass = "text-indigo-400"; }
+      else if (scoreOn10 >= 7.0) { qual = "NOTABLE"; qualClass = "text-emerald-400"; }
+      else if (scoreOn10 >= 6.0) { qual = "BIEN"; qualClass = "text-teal-300"; }
+      else if (scoreOn10 >= 5.0) { qual = "SUFICIENTE"; qualClass = "text-amber-400"; }
+      else { qual = "INSUFICIENTE"; qualClass = "text-rose-400"; }
+
+      // Time spent calculation
+      const timeSpentSec = 3600 - appState.challenge.timerSeconds;
+      const spentMin = Math.floor(timeSpentSec / 60);
+      const spentSec = timeSpentSec % 60;
+
+      // Populate Report UI
+      document.getElementById('report-date').textContent = new Date().toLocaleDateString('es-ES', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+      document.getElementById('report-score-num').textContent = scoreOn10;
+      document.getElementById('report-score-qualitative').textContent = qual;
+      document.getElementById('report-score-qualitative').className = `text-xs font-bold uppercase tracking-wider mt-0.5 ${qualClass}`;
+
+      document.getElementById('report-correct-count').textContent = `${correctCount} / 20`;
+      document.getElementById('report-incorrect-count').textContent = `${incorrectCount} / 20`;
+      document.getElementById('report-omitted-count').textContent = `${omittedCount}`;
+      document.getElementById('report-time-spent').textContent = `${spentMin}m ${spentSec}s`;
+
+      // Render Question-by-Question Detailed Breakdown
+      const listContainer = document.getElementById('report-questions-list');
+      listContainer.innerHTML = '';
+
+      questions.forEach((q, idx) => {
+        const uAnsIdx = userAnswers[idx];
+        const isCorrect = uAnsIdx !== null && q.options[uAnsIdx].correct;
+        const isOmitted = uAnsIdx === null;
+
+        let statusBadge = '';
+        let cardBorder = '';
+
+        if (isCorrect) {
+          statusBadge = '<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-emerald-950 text-emerald-300 border border-emerald-500/40">Correcta (+0.5 pts)</span>';
+          cardBorder = 'border-emerald-500/40 bg-slate-800/80';
+        } else if (isOmitted) {
+          statusBadge = '<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-800 text-slate-400 border border-slate-600/40">Sin responder (0 pts)</span>';
+          cardBorder = 'border-slate-700 bg-slate-800/60';
+        } else {
+          statusBadge = '<span class="px-2.5 py-1 rounded-lg text-xs font-bold bg-rose-950 text-rose-300 border border-rose-500/40">Incorrecta (0 pts)</span>';
+          cardBorder = 'border-rose-500/40 bg-slate-800/80';
+        }
+
+        const userText = isOmitted ? '<i>No respondiste</i>' : q.options[uAnsIdx].text;
+        const correctText = q.options.find(o => o.correct).text;
+
+        const card = document.createElement('div');
+        card.className = `p-5 rounded-2xl border ${cardBorder} shadow-lg space-y-3`;
+        card.innerHTML = `
+          <div class="flex items-center justify-between pb-2 border-b border-slate-700/60">
+            <span class="text-xs font-bold text-slate-400">Pregunta ${idx + 1} • Nivel ${q.level}</span>
+            ${statusBadge}
+          </div>
+          <div class="text-sm sm:text-base font-medium text-slate-100">${q.question}</div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs pt-2">
+            <div class="p-2.5 rounded-lg bg-slate-900/80 border border-slate-800">
+              <span class="text-slate-400 font-semibold">Tu respuesta:</span>
+              <div class="text-slate-200 mt-1">${userText}</div>
+            </div>
+            <div class="p-2.5 rounded-lg bg-emerald-950/30 border border-emerald-800/40">
+              <span class="text-emerald-400 font-semibold">Respuesta correcta:</span>
+              <div class="text-emerald-200 mt-1">${correctText}</div>
+            </div>
+          </div>
+          <details class="pt-2">
+            <summary class="text-xs font-semibold text-indigo-400 hover:text-indigo-300 cursor-pointer">Ver Solución Paso a Paso</summary>
+            <div class="mt-2 space-y-2 text-xs text-slate-300 p-3 rounded-xl bg-slate-900 border border-slate-800">
+              ${q.explanationSteps.map(s => '<div>' + s + '</div>').join('')}
+            </div>
+          </details>
+        `;
+        listContainer.appendChild(card);
+      });
+
+      renderMath();
+    }
+
+
+    /* ===================================================================
+       6. NAVIGATION & MODALS CONTROLLER
+       =================================================================== */
+    function switchMode(newMode) {
+      playSound('click');
+      appState.mode = newMode;
+
+      const viewPractice = document.getElementById('view-practice');
+      const viewChallenge = document.getElementById('view-challenge');
+      const viewReport = document.getElementById('view-report');
+
+      const navPractice = document.getElementById('nav-mode-practice');
+      const navChallenge = document.getElementById('nav-mode-challenge');
+
+      viewPractice.classList.add('hidden');
+      viewChallenge.classList.add('hidden');
+      viewReport.classList.add('hidden');
+
+      if (newMode === 'practice') {
+        viewPractice.classList.remove('hidden');
+        navPractice.className = "px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center space-x-1.5 bg-brand-600 text-white shadow";
+        navChallenge.className = "px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center space-x-1.5 text-slate-400 hover:text-slate-200";
+        if (!appState.practice.currentQuestion) generateNextPracticeQuestion();
+      } else if (newMode === 'challenge') {
+        viewChallenge.classList.remove('hidden');
+        navChallenge.className = "px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center space-x-1.5 bg-brand-600 text-white shadow";
+        navPractice.className = "px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all flex items-center space-x-1.5 text-slate-400 hover:text-slate-200";
+        if (appState.challenge.questions.length === 0) startChallengeExam();
+      } else if (newMode === 'report') {
+        viewReport.classList.remove('hidden');
+      }
+
+      renderMath();
+    }
+
+    function toggleTheoryModal(show) {
+      playSound('click');
+      const modal = document.getElementById('modal-theory');
+      if (show) {
+        modal.classList.remove('hidden');
+        renderMath();
+      } else {
+        modal.classList.add('hidden');
+      }
+    }
+
+
+    /* ===================================================================
+       7. INITIALIZATION ON WINDOW LOAD
+       =================================================================== */
+    window.onload = function () {
+      setPracticeLevel(1);
+      console.log('Potentia 4º ESO initialized successfully.');
+    };
+  </script>
+</body>
+</html>
